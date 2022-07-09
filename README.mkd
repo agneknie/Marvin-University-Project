@@ -1,4 +1,8 @@
 # COM3505 Lab Assessment 2
+
+## Assignment for Internet of Things module at the University of Sheffield. Implementing a DIY Alexa (Voice Assistant) with C on Espressif ESP32. Grade: 81%.
+
+
 # Introduction
 Marvin is a DIY Alexa, which otherwise could be defined as a voice command recognition system, which acts on the processed commands. The core of this, including the wake-word detection, voice recognition, command processing and command realisation framework is originally implemented by Chris Greening and can be found [here](https://github.com/atomic14/diy-alexa). This project uses a fork of the former, which is implemented by Hamish Cunningham and can be found [here](https://github.com/hamishcunningham/diy-alexa).
 
@@ -29,18 +33,18 @@ Marvin would sometimes randomly freeze after wake-word detection. This problem w
 
 I have traced the problem to the `DetectWakeWordState::run` method. Interestingly enough, this problem would sometimes disappear after full recompilations of the code, burning the firmware fresh or just restarting my laptop. However, I have semi-fixed the issue, which I discuss in the last section.
 
-![error with hanging on the wake word](../LA2/Media/Errors/DetectWakeWordState_run.PNG)
+![error with hanging on the wake word](./Media/Errors/DetectWakeWordState_run.PNG)
 
 
 
 ## Marvin Throws an Error & Restarts after each Command
 At the beginning, Marvin would correctly get the command and fulfil it but would throw an error, which would cause it to restart.
 
-![restart after each command screenshot](../LA2/Media/Errors/Marvin_Error_After_Each_Command.PNG)
+![restart after each command screenshot](./Media/Errors/Marvin_Error_After_Each_Command.PNG)
 
 I have traced it to the `getInputBuffer` method of the `NeuralNetwork.cpp`. I have not been able to find out what the problem was, but during debugging of other problems, described below, I have discovered how to avoid the error for about 95% of cases, whilst speaking with Marvin.
 
-![restart after each command cause screenshot](/LA2/Media/Errors/NeuralNetwork_getInputBuffer.PNG).
+![restart after each command cause screenshot](./Media/Errors/NeuralNetwork_getInputBuffer.PNG).
 
 
 
