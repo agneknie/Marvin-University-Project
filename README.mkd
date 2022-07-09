@@ -1,0 +1,137 @@
+# COM3505 Lab Assessment 2
+# Introduction
+Marvin is a DIY Alexa, which otherwise could be defined as a voice command recognition system, which acts on the processed commands. The core of this, including the wake-word detection, voice recognition, command processing and command realisation framework is originally implemented by Chris Greening and can be found [here](https://github.com/atomic14/diy-alexa). This project uses a fork of the former, which is implemented by Hamish Cunningham and can be found [here](https://github.com/hamishcunningham/diy-alexa).
+
+The current system is able to turn some "devices" on and off, as well as tell some jokes and provides an outlook on life. Further information of the whole specification can be found in [this blogpost](https://www.cmgresearch.com/2020/10/15/diy-alexa.html) and [this video](https://www.youtube.com/watch?v=FZ4ayyTXM2s&ab_channel=atomic14).
+
+This project aims to extend the aforementioned work by mimicking a simple children's game of animal sounds. As my best friend's brother is now approaching the age of "asking every question possible" and is very amused by every weird-looking project I bring over, I have decided to use Marvin for answers to some of those questions. The questions I have in mind follow the lines of *"What does a cow say?"*, *"What is the word dogs use?"*, *"Can you make that dolphin sound?"*, etc.
+
+
+
+
+
+# Marvin Setup
+Unfortunately, I had quite some issues with setting up the original Marvin, which ate up a lot of my development time. However, I would like to think that each problem got me closer to calling myself an IoT engineer and that I have learnt a lesson or two from the whole experience.
+
+In this section, I highlight a few of those issues and how I came about to (almost) solve them.
+
+
+
+## Uploading Software to Marvin via PlatformIO
+I have used PlatformIO extension for VS Code to burn the firmware into my ESP32. Unfortunately, I faced an issue, where at times Windows would flag a port as in-use and thus it could not be used by PlatformIO. I have researched the problem online and found a [semi-solution here](https://community.platformio.org/t/could-not-open-port/6359).
+
+The problem seems to be that PlatformIO has control over some ports, which it thinks are free but in reality they are not or are not marked as such by PlatformIO itself. As the provided solution describes, I have picked a high-number port and manually forced PlatformIO to use it by defining it as `upload_port = COM35` in `platformio.ini`. This has solved the issue for the majority of cases, however, I do have an occasional problem whilst burning the firmware, which seems to happen more frequently whilst updating the data files with `pio run -t uploadfs`.
+
+
+
+## Marvin Randomly Freezes after Wake-Word Detection
+Marvin would sometimes randomly freeze after wake-word detection. This problem was also [discussed on the Blackboard discussion forum for the course](https://vle.shef.ac.uk/webapps/discussionboard/do/message?action=list_messages&course_id=_96458_1&nav=discussion_board_entry&conf_id=_303109_1&forum_id=_297213_1&message_id=_970153_1) and unfortunately had no solutions.
+
+I have traced the problem to the `DetectWakeWordState::run` method. Interestingly enough, this problem would sometimes disappear after full recompilations of the code, burning the firmware fresh or just restarting my laptop. However, I have semi-fixed the issue, which I discuss in the last section.
+
+![error with hanging on the wake word](../LA2/Media/Errors/DetectWakeWordState_run.PNG)
+
+
+
+## Marvin Throws an Error & Restarts after each Command
+At the beginning, Marvin would correctly get the command and fulfil it but would throw an error, which would cause it to restart.
+
+![restart after each command screenshot](../LA2/Media/Errors/Marvin_Error_After_Each_Command.PNG)
+
+I have traced it to the `getInputBuffer` method of the `NeuralNetwork.cpp`. I have not been able to find out what the problem was, but during debugging of other problems, described below, I have discovered how to avoid the error for about 95% of cases, whilst speaking with Marvin.
+
+![restart after each command cause screenshot](/LA2/Media/Errors/NeuralNetwork_getInputBuffer.PNG).
+
+
+
+## Marvin Cannot Play a Joke or Talk about Life
+Marvin could recognise the commands perfectly for all of the intended original actions, however, it could not play a joke or talk about life.
+
+I have doubled-checked that the `.wav` files in the `data` folder have been uploaded to the ESP32 and have recompiled with different configuration variations, however, I could not get Marvin to joke around with me. I have determined, that Marvin successfully gets to the stage of actually playing the relevant sound in `Speaker.cpp`, but somehow is not able to do so. It also does not throw any errors when this happens, but no sounds come out either.
+
+I have also considered the possibility of reducing file size and audio length and tried compressing and reformatting the files regarding bit rates, depths and other parameters with [Audacity](https://www.audacityteam.org/). However, it brought no success. Other people encountered this problem as well, as I have found a [relevant Blackboard Discussion Thread](https://vle.shef.ac.uk/webapps/discussionboard/do/message?action=list_messages&course_id=_96458_1&nav=discussion_board_entry&conf_id=_303109_1&forum_id=_297213_1&message_id=_965736_1), unfortunately, no answers were found there.
+
+
+
+## Unified (Almost) Solution
+After many hours of debugging, I believe that there is an issue with the `.wav` files and my Marvin disliking them. When I remove all joke and life related `.wav` files from the data, uploaded into the ESP32, the issues with Marvin freezing and restarting after each command seem to stop almost entirely. As I used other `.wav` files for my project, they do have some issues sometimes whilst playing as well, even though Marvin correctly navigates through the right methods and selects the right files to play. I believe this could be related to the ports issue described above, as after changing ports, restarting my machine and re-burning of the firmware I am able to get it to work. Unfortunately, it is still not reliable and all of the aforementioned problems return from time to time without a seeming reason. Different errors are thrown around as well, some relating to connectivity to [Wit.ai](https://wit.ai/), some to connecting to the Wi-Fi in general and some to audio processing in terms of incorrect file encoding.
+
+
+
+
+
+# Hardware
+
+The hardware for Marvin was kept as it was intended originally, as my project only extended on the software part of Marvin. Briefly, Marvin is composed of a ESP32, which is connected to a ICS43434 microphone, 4Ω speaker and three LEDs. The speaker is also connected to a MAX98357 amplifier, whilst each LED is protected with a 120Ω resistor. The following pictures present the wiring (fritzing) diagram, which is borrowed from [COM3505 Lecture Notes](https://iot.unphone.net/#sec:marvin) and an overall components diagram, developed during the assembly stage of this project.
+
+![Marvin Fritzing Diagram](Media/DeviceAppearance/Marvin_Fritzing_diagram.png)
+![Marvin Components Diagram](Media/DeviceAppearance/Marvin%20Components%20Diagram.png)
+
+The remaining media in this section presents fully hardware-side completed Marvin.
+
+![Marvin GIF Side to Side](Media/DeviceAppearance/Side%20to%20Side.gif)
+![Marvin GIF Top to Bottom](Media/DeviceAppearance/Top%20to%20Bottom.gif)
+
+
+
+# Software 
+## Original Marvin
+
+The original Marvin, used as a base for this project, operates between two states: wake-word detection and command recognition. During the former, Marvin is always listening for its name and a [trained neural network model](https://github.com/atomic14/diy-alexa#wake-word-detection) is stored in the device to undertake this task. When the wake-word is recognised, Marvin records up to 3 seconds of audio, which is then passed on to a cloud service [Wit.ai](https://wit.ai/). The service extracts the voice command as a text, which is formed into an [Intent](ProjectThing/firmware/src/IntentProcessor.cpp). Marvin later uses that intent, to figure out, what action needs to be performed. A simplified diagram of the whole process is presented below.
+
+![Original Marvin Working Diagram](Media/DeviceAppearance/Marvin%20Software%20Diagram.png)
+
+## Extended Marvin
+This project aims to extend Marvin by narrowing its use for a specific purpose. As briefly discussed in the introduction, the goal is to transform Marvin into a toy for children, which would respond to voice commands, such as *"What does this animal say?"* with an appropriate animal sound. Thus, the extended Marvin aims to be educational to very eager but yet very young IoT enthusiasts. The following diagram outlines the proposed extensions of Marvin in the context of the currently available system.
+
+![Extended Marvin Working Diagram](Media/DeviceAppearance/Marvin%20Software%20Diagram%20Extended.png)
+
+The implementation of the extension was quite straightforward, as it extended the [IntentProcessor](ProjectThing/firmware/src/IntentProcessor.cpp) by adding support for a different intent, named `Animal_sound`. If the processor encounters this kind of intent, the relevant function would check the `device` property of the intent to determine, what kind of animal sound was requested. Then, Marvin would play the relevant sound through the [Speaker](ProjectThing/firmware/src/Speaker.cpp), if such animal is amongst the defined ones. The other part of the solution included configuring [Wit.ai](https://wit.ai/) with a new type of intent and phrases, which would be recognised by Marvin. Such phrases included, but are not limited to *"What does the X say?"* and *"Mimic X"*, where *X* is an animal name. So far, Marvin is able to recognise and mimic 10 animals: cat, dog, duck, chicken, cow, crow, dolphin, pig, sheep and lion. The following figure outlines the described process visually whilst including some key code snippets.
+
+![Marvin Code Snippets Diagram](Media/CodeSnippets/Marvin%20Code%20Snippets.png)
+
+
+
+
+
+# Marvin in Action
+The final Marvin is capable of playing a simple game of *"What does X animal say?"*, which, as mentioned, is geared at the youngest IoT enthusiast-engineers. It is also able to turn on and off the lights, present in the above pictures, both all together and one by one. The joking and life story telling capability had to be removed, as the `.wav` files of those actions were causing problems and were too large for the capacity of the ESP32 and would cause Marvin to crash.
+
+A short demonstration of Marvin in action can be [seen here](https://youtu.be/dpwNEq6iLYE).
+
+
+
+
+
+# Testing
+As the neural network model and wake-word detection system is not modified in any way, the testing consideration does not cover these parts of the system in depth. The [wake-word recognition system](https://github.com/atomic14/diy-alexa#wake-word-detection) and [model training](https://github.com/atomic14/diy-alexa#wake-word-detection) is quite heavily documented in the [original README](https://github.com/atomic14/diy-alexa) and further information regarding this can be found there. However, it should be noted that the recognition of the wake-word "Marvin" is not perfect, as the system sometimes activates from random loud sounds or does not react to the wake word. This could be accounted to the problems in the speech recognition model, which could be uncovered and investigated through testing.
+
+
+The [Wit.ai](https://wit.ai/) should be tested with more varied voice commands of different voice tones, accents and pronunciations. Also, various background noises seem to make command recognition more difficult as well. Therefore, supplying [Wit.ai](https://wit.ai/) with more data through Marvin or HTTP requests, verifying the utterances through the site and testing with different variations of voice commands would definitely enhance the system or point out its current flaws.
+
+The system in itself is well-structured in terms of understandability. For example, the concept of changing states, processing intents and doing certain actions is quite straightforward by looking at the original [README](https://github.com/atomic14/diy-alexa) and the code itself. However, what seems to be overlooked and should definitely be tested is adding higher numbers of commands and actions, which are performable by Marvin. During the setup and implemented functionality testing stages it was observed, that Marvin performs considerably poorer or stops performing all together if a lot of files are loaded to the ESP32 from the `data` folder. As well as that, when Marvin is capable of more actions, the performance decreases and the system is more prone to freezing. These claims should be verified by structured testing and measurement of relevant indicators, such as free memory, resource allocation, current resource usage, etc. This kind of testing is crucial, as it is currently unclear what is the expansion capacity of Marvin to become the next [Alexa](https://developer.amazon.com/en-US/alexa), [Siri](https://www.apple.com/uk/siri/) or [Bixby](https://www.samsung.com/uk/support/mobile-devices/what-is-bixby-and-how-do-i-use-it/) and whether it is at all possible.
+
+Lastly, separation between intents themselves should be tested. Even though currently Marvin rarely mistakes one intent for the other, this could change in the future, when more intents are added. This testing should cover the preciseness of recognised commands and whether they can be correctly classified based on the available intent parameters.
+
+
+# Future Considerations
+First and foremost, as discussed in the 'Testing' section, assessments and corrections should be made on the inner workings of Marvin regarding correct data and resource allocation. Marvin seems to have issues with random freezing and resetting/restarting, as well as playing some `.wav` files, even though they are configured and processed according to the library's specifications. As highlighted both in the 'Testing' and 'Marvin Setup' sections, various errors appear when Marvin is overwhelmed either by the number of data files and/or defined intents, that it can process. This could seriously hinder any future expansion, thus needs to be addressed at first instance if and when any future enhancements are made. However, it is worth considering that the problems could be related only to my specific setup or even my exact ESP32, hence some of the problems might not be reproduceable or not exist in general.
+
+Regarding the more specific extensions relating to the implemented project, the obvious one would be to add more animal sounds thus expanding the animal sound library. If `.wav` file storage on the ESP32 becomes a problem due to aforementioned restrictions, it would be wise to research such options, which would allow sound file retrieval from the cloud.
+
+Moving towards a more general project enhancement, the topic of "Children Toy" could be elucidated further, both from the hardware and software perspective. In terms of hardware, the current setup, even though geared towards children, does require at least minor adult supervision, as small parts and easily removable wires would not be considered very child-proof. In terms of software, Marvin could be extended to deal with not only animal sound but also other child-relevant information, such as information about the environment, the world around us, etc. As Marvin itself expresses, `Here I am, brain the size of a planet...`- the possibilities are endless even when considering only relatively simple, children-oriented information retrieval and presentation.
+
+
+
+
+
+# Self-Assessment
+Overall, I believe this course has provided me with a very good opportunity, tools and support to explore the world of IoT engineering and what comes with it. In the remainder of this report I present a few highlights of what I feel is worth noting from a personal learning experience.
+
+Development in IoT is very different from the one a typical computer science student is used to. Trying to figure out whether my code or my hardware setup does not work ate up the most of my time, which is unfortunate in terms of project progress but provided a good learning experience. It made me appreciate thorough design for all parts of the system and forced me to move away from only my area of expertise and comfort, which is usually just coding. Every new uncomfortable experience is a good experience in my book, regardless of the result.
+
+I do believe that full potential with Marvin is definitely not reached, as my initial plans included controlling an LED strip I have in my room according to the music played and heard through the microphone by Marvin, similarly how [it is implemented here](https://www.youtube.com/watch?v=lU1GVVU9gLU&ab_channel=DevonCrawford). However, I could not source MOSFET transistors in time, how suggested by [this](https://forum.arduino.cc/t/led-strip-mosfet-arduino-best-way-to-do/417538) and [many](https://www.instructables.com/Driving-RGB-LED-strips-off-an-Arduino/) [other](https://tigoe.github.io/LightProjects/led-strips.html) [articles](https://www.makeuseof.com/tag/connect-led-light-strips-arduino/) for this type of project.
+
+This, combined together with the errors I encountered, forced me to decided to settle for something less. And even that smaller project is not fully completed- Marvin sometimes does not play the animal sounds at all, does not like the sound files and refuses to contain them in the ESP32 in general. The presentation video captures the functionality, however, it is far from being that smooth as it appears.
+
+In conclusion, IoT is many times harder than traditional programming. However, as with traditional programming, it is extremely exciting when after many tries, something finally works. With IoT, that excitement is also multiplied by the same many times.

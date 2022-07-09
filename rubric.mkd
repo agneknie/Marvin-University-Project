@@ -1,0 +1,94 @@
+
+# Lab Assessment 2 (LA2, project) ###########################################
+
+Design, build, test and document an IoT device that:
+
+- demonstrates the typical IoT configuration of microcontroller, sensors and
+  actuators (and, optionally, cloud-based analytics, data aggregation or
+  control)
+- is well-documented at both technical and operational levels, including
+  hardware photographs, and a brief video (**maximum** 1 minute long) of the
+  system in use
+
+The system should exhibit a useful task of your choice, within the constraints
+of the available hardware (an unPhone, or a bare ESP32 feather or the voice
+control "DIY Alexa" components, or etc. by arrangement).
+
+The code and documentation of the device **must be located** in your gitlab
+repository (`com3505-student-2022`) under a top-level directory named `LA2`.
+Documentation must be in a `README.mkd` in the `LA2` directory, and code in a
+subdirectory called `ProjectThing`. For example, when cloned the file
+structure will look like this:
+
+- `com3505-student-2022/LA2`
+- `com3505-student-2022/LA2/README.mkd`
+- `com3505-student-2022/LA2/rubric.mkd` (this file)
+- `com3505-student-2022/LA2/`...other doc files etc....
+- `com3505-student-2022/LA2/ProjectThing`
+- `com3505-student-2022/LA2/ProjectThing/ProjectThing.ino`
+- `com3505-student-2022/LA2/ProjectThing/`...other code files etc....
+- ...etc....
+
+The project is yours to keep after the course (and may serve as a
+cyber-physical demonstration of your skills and interests for interviews and
+the like).
+
+The work will be assessed according to:
+
+- hardware
+- firmware code
+- documentation
+
+The assessment is **open-ended**, **qualitative**, and used to determine your
+final classification for the course (pass, 3rd, upper or lower 2nd, 1st).
+
+**Notes**:
+
+- **Deadline**. Friday 20th May at 12 midday UK time. (At this point a
+  snapshot of your gitlab repository will be taken for marking.)
+- **Size**. If you have spent the approximate amount of time we recommend for
+  a 10 credit course (around 8 hours per week) on the work so far, you should
+  be able to achieve a good solution (including hardware, code and
+  documentation) within a similar amount of time (8 hours), or less.
+- **Marks**. The assessment is marked out of 100 and contributes a possible
+  maximum of 60 to your score for the course. Marks will be allocated for both
+  qualitative and quantitative characteristics of hardware, code, and
+  documentation. (LA1 and the exam are pass/fail threshold elements of your
+  assessment; LA2 dictates your grade after passing the other two. It is
+  possible to pass the course without completing LA2, in which case your mark
+  will be 40.)
+- **Design**. Have you chosen a task which: demonstrates the capabilities of
+  IoT devices? is viable and realistic? Have you documented: the rationale for
+  this task? how it will be implemented? and tested?
+- **Code**. Code is assessed according to both functionality (does the device
+  do what is intended? is the operation robust in face of different
+  conditions? etc.) and quality (is it structured to enhance readability and
+  maintainability? is there appropriate commenting? does it conform to a style
+  and stick to it? are interfaces minimised and simplicity maximised? etc.).
+- **Documentation**. In addition documentation is assessed, and students'
+  abilities to demonstrate their work in operation (in the video).
+  Documentation which is clear, well written and illustrated appropriately
+  will score more marks, as will reference to appropriate supporting materials
+  (e.g. from the course reading lists). Linking of on-line API reference
+  materials and/or library sources is also a good idea.
+- **Testing**. Code that "seems to work" is the first step in a (non-TDD!)
+  project; code that has been tested to destruction, fixed and tested again,
+  and again, and again, stands a chance of being _reliable_. Documenting what
+  type of testing is appropriate to a particular task will attract extra
+  marks, as will the implementation of tests and/or data collection routines
+  that make the performance characteristics of code more explicit. How does
+  the hardware nature of the work influence testing strategies, and how might
+  this be addressed?
+- **Self assessment**. Include a critical review of the work, explaining what
+  went well and what not so well, and looking ahead at how the device might be
+  evolved in future.
+
+This is an advanced course and the project assessment in particular is
+intentionally open-ended. There is no single right answer! If you're unsure
+about how much effort to expend the rule of thumb is to put in as many hours
+as is reasonable for a 10 credit module, spread across the final weeks of the
+course. If you have the time and enthusiasm to spend more, then go ahead: the
+sky is the limit on this type of project! But also be mindful of your other
+commitments.
+
+Best of luck!
