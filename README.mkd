@@ -1,6 +1,6 @@
 # COM3505 Lab Assessment 2
 
-### Assignment for Internet of Things module at the University of Sheffield. Implementing a DIY Alexa (Voice Assistant) with C on Espressif ESP32. Grade: 81%.
+### Assignment for Internet of Things module at the University of Sheffield. Implementing a DIY Alexa (Voice Assistant) with C on Espressif ESP32. Grade: 81% (First Class).
 
 
 # Introduction
